@@ -1,0 +1,46 @@
+version: '3.3'
+services:
+  backend:
+    container_name: converter-backend
+    build: ./converter-backend
+    depends_on:
+      - db-mongo
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_HOST: db-mongo
+      DATABASE_USER: root
+      DATABASE_PASSWORD: example
+      DATABASE_NAME: converter
+      DATABASE_PORT: 27017
+    networks:
+      - backend
+      - frontend
+  frontend:
+    container_name: converter-client
+    build: ./converter-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - frontend
+  db-mongo:
+    container_name: converter-mongo-db
+    image: mongo:5
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodata:/var/lib/mongodb/data
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    networks:
+      - backend
+volumes:
+  mongodata:
+
+networks:
+  backend:
+  frontend:
